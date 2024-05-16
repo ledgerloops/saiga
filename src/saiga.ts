@@ -1,5 +1,5 @@
-import * as Earthstar from "https://deno.land/x/earthstar@v10.2.2/mod.ts";
 import EventEmitter from "node:events";
+import { MessageForwarder } from "../../ledgerloops-earthstar/src/messaging.ts";
 import { ProbesEngine } from "./engine/probesengine.ts";
 import { SaigaFriendsEngine } from "./engine/friendsengine.ts";
 import { TracesEngine } from "./engine/tracesengine.ts";
@@ -7,65 +7,27 @@ import { SaigaLoopsEngine } from "./engine/loopsengine.ts";
 import { getMessageType } from "./messages.ts";
 
 export class Saiga extends EventEmitter {
+  protected messageForwarder: MessageForwarder;
   protected friendsEngine: SaigaFriendsEngine;
   protected probesEngine: ProbesEngine;
   protected tracesEngine: TracesEngine;
   protected loopsEngine: SaigaLoopsEngine;
   protected debugLog: string[] = [];
   protected name: string;
-  protected authorKeypair?: Earthstar.AuthorKeypair;
 
-  constructor(name: string) {
+  constructor(name: string, messageForwarder: MessageForwarder) {
     super();
     this.name = name;
+    this.messageForwarder = messageForwarder;
     this.friendsEngine = new SaigaFriendsEngine(name);
     this.probesEngine = this.connectProbesEngine();
     this.tracesEngine = this.connectTracesEngine(this.probesEngine);
     this.loopsEngine = this.connectLoopsEngine(this.tracesEngine);
     this.loopsEngine.setProfit(0.01);
   }
-  async getAuthorKeypair(): Promise<Earthstar.AuthorKeypair> {
-    if (this.authorKeypair) {
-      return this.authorKeypair;
-    }
-    const authorKeypair: Earthstar.AuthorKeypair | Earthstar.ValidationError = await Earthstar.Crypto.generateAuthorKeypair(this.name);
-    if (Earthstar.isErr(authorKeypair)) {
-      console.error(authorKeypair);
-      Deno.exit(1);
-    }
-    this.authorKeypair = authorKeypair as Earthstar.AuthorKeypair;
-    return this.authorKeypair
-  }
-  async meet(other: string, shareKey: Earthstar.ShareKeypair) {
-    const shareAddress = shareKey.shareAddress;
-    const shareSecret = shareKey.secret;
-    const authorKeypair = await this.getAuthorKeypair();
-    const replica = new Earthstar.Replica({
-      driver: new Earthstar.ReplicaDriverMemory(shareAddress),
-      shareSecret,
-    });
-    const peer = new Earthstar.Peer();
-    peer.addReplica(replica);
-    peer.sync("http://localhost:8000", true);
-    replica.set(authorKeypair, {
-      text: `Hello, ${other}!`,
-      path: `/chat/~${authorKeypair.address}/${Date.now()}`,
-    });
-    const cache = new Earthstar.ReplicaCache(replica);
-    cache.onCacheUpdated(() => {
-      const chatDocs = cache.queryDocs({
-        filter: { pathStartsWith: "/chat" },
-      });
-      for (const doc of chatDocs) {
-        console.log(`[${this.name}] ${doc.author.substr(1, 4)}: ${doc.text}`);
-      }
-    });
-    // Work around https://github.com/earthstar-project/earthstar/issues/329
-    cache.queryDocs();
+  async init() {
 
-    console.log(`${this.name} met ${other}`);
   }
-
   protected connectProbesEngine(): ProbesEngine {
     const probesengine = new ProbesEngine(this.name);
     probesengine.on('message', (to: string, message: string) => {
@@ -148,7 +110,7 @@ export class Saiga extends EventEmitter {
       case `okay-to-send-probes`: return this.probesEngine.handleOkayToSendProbesMessage(sender);
     }
   }
-  meet2(other: string, createProbe: boolean = true, maxBalance: number = 10.0): void {
+  meet(other: string, createProbe: boolean = true, maxBalance: number = 10.0): void {
     const newFriendship = this.friendsEngine.addFriend(other, maxBalance);
     if (!newFriendship) {
       return;
