@@ -62,7 +62,12 @@ export class Saiga extends EventEmitter implements NetworkNode {
   protected connectLoopsEngine(traceEngine: TracesEngine): SaigaLoopsEngine {
     const loopsEngine = new SaigaLoopsEngine();
     traceEngine.on('loop-found', (probeId: string, traceId: string, legId: string, outgoing: string, incoming: string) => {
-      loopsEngine.handleLoopFound(probeId, traceId, legId, this.friendsEngine.getFriend(outgoing), this.friendsEngine.getFriend(incoming));
+      const outgoingFriend = this.friendsEngine.getFriend(outgoing);
+      const incomingFriend = this.friendsEngine.getFriend(incoming);
+      if (typeof outgoingFriend === 'undefined' || typeof incomingFriend === 'undefined') {
+        return;
+      }
+      loopsEngine.handleLoopFound(probeId, traceId, legId, outgoingFriend, incomingFriend);
     });
     loopsEngine.on('debug', (message: string) => {
       this.debugLog.push(message);
@@ -77,6 +82,10 @@ export class Saiga extends EventEmitter implements NetworkNode {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [messageType, probeId, traceId, legId] = message.split(' ');
     const otherPartyName = this.tracesEngine.getOtherParty(from, probeId, traceId, legId);
+    if (typeof otherPartyName === 'undefined') {
+      this.debugLog.push(`other party not found for ${from} ${message}`);
+      return;
+    }
     const sender = this.friendsEngine.getFriend(from);
     const otherParty = this.friendsEngine.getFriend(otherPartyName);
     if (typeof sender === 'undefined' || typeof otherParty === 'undefined') {

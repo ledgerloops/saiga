@@ -56,10 +56,8 @@ export class GiraffeLoopsEngine extends EventEmitter {
     }
     if (typeof this.lifts[hash] !== 'undefined') {
       this.lifts[hash].incomingAmount = parseFloat(amount);
-      this.emit('debug', `initiator decides on lift: is ${this.lifts[hash].incomingAmount} more than ${this.lifts[hash].outgoingAmount}?`);
-      if (this.lifts[hash].incomingAmount >= this.lifts[hash].outgoingAmount) {
-        this.emit('message', proposer.name, `commit ${probeId} ${traceId} ${legId} ${hash} ${this.lifts[hash].incomingAmount} ${this.lifts[hash].secret}`);
-      }
+      this.emit('debug', `initiator decides on lift: always yes`);
+      this.emit('message', proposer.name, `commit ${probeId} ${traceId} ${legId} ${hash} ${this.lifts[hash].incomingAmount} ${this.lifts[hash].secret}`);
     } else {
       const incomingAmount = parseFloat(amount);
       const outgoingAmount = this.makeProfit(incomingAmount * proposer.exchangeRate / committer.exchangeRate);

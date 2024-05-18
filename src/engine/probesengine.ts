@@ -143,6 +143,9 @@ export class ProbesEngine extends EventEmitter {
     if (typeof this.probesToOffer[friend] !== 'undefined') {
       this.probesToOffer[friend].forEach(probeId => {
         const probe = this.get(probeId);
+        if (typeof probe === 'undefined') {
+          throw new Error(`Probe ${probeId} not found`);
+        }
         if (probe.isVirginFor(friend)) {
           this.emit('debug', `QUEUEING PROBE ${probe.getProbeId()} TO ${friend} [3/4]`);
           probe.recordOutgoing(friend);
@@ -150,7 +153,7 @@ export class ProbesEngine extends EventEmitter {
           this.emit('message', friend, message);
         }
       });
-      delete this.friends[friend].promises;
+      this.friends[friend].promises = [];
     }
   }
   public handleOkayToSendProbesMessage(friend: string): void {
