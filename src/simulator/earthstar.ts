@@ -1,4 +1,4 @@
-import { MixedNetworkSimulator, TransportPackage } from "./networksimulator.js";
+import { MixedNetworkSimulator, TransportPackage } from "./networksimulator.ts";
 
 export class EarthstarMessaging {
     networkSimulator: MixedNetworkSimulator;

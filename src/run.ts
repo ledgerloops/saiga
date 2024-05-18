@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { readFileSync } from 'node:fs';
-import { BatchedNetworkSimulator, Saiga } from './main.js';
+import { BatchedNetworkSimulator, Saiga } from './main.ts';
 
 const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
 const NUM_ROUNDS = 100000;

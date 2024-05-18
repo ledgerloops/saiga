@@ -1,10 +1,10 @@
 import EventEmitter from "node:events";
-import { NetworkNode } from "./simulator/networksimulator.js";
-import { getMessageType } from "./messages.js";
-import { ProbesEngine } from "./engine/probesengine.js";
-import { SaigaFriendsEngine } from "./engine/friendsengine.js";
-import { TracesEngine } from "./engine/tracesengine.js";
-import { SaigaLoopsEngine } from "./engine/loopsengine.js";
+import { NetworkNode } from "./simulator/networksimulator.ts";
+import { getMessageType } from "./messages.ts";
+import { ProbesEngine } from "./engine/probesengine.ts";
+import { SaigaFriendsEngine } from "./engine/friendsengine.ts";
+import { TracesEngine } from "./engine/tracesengine.ts";
+import { SaigaLoopsEngine } from "./engine/loopsengine.ts";
 
 export class Saiga extends EventEmitter implements NetworkNode {
   protected friendsEngine: SaigaFriendsEngine;

@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import { genRanHex } from "../genRanHex.js";
+import { genRanHex } from "../genRanHex.ts";
 
 export class TracesEngine extends EventEmitter {
   tracesCreated = {};

@@ -1,3 +1,3 @@
 
-export { Saiga } from './saiga.js';
-export { BasicNetworkSimulator, BatchedNetworkSimulator, MixedNetworkSimulator } from './simulator/networksimulator.js';
+export { Saiga } from './saiga.ts';
+export { BasicNetworkSimulator, BatchedNetworkSimulator, MixedNetworkSimulator } from './simulator/networksimulator.ts';

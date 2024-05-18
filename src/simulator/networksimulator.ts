@@ -1,7 +1,7 @@
 import EventEmitter from "node:events";
-import { getMessageType } from "../messages.js";
-import { Entry, createPlantUml } from "../util.js";
-import { EarthstarMessaging } from "./earthstar.js";
+import { getMessageType } from "../messages.ts";
+import { Entry, createPlantUml } from "../util.ts";
+import { EarthstarMessaging } from "./earthstar.ts";
 
 export abstract class NetworkNode extends EventEmitter {
   abstract process(from: string, message: string);

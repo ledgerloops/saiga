@@ -1,4 +1,4 @@
-import { genRanHex } from "../genRanHex.js";
+import { genRanHex } from "../genRanHex.ts";
 import { EventEmitter } from 'node:events';
 
 export enum HandRaisingStatus {

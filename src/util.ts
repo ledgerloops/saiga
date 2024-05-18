@@ -1,4 +1,4 @@
-export { genRanHex } from "./genRanHex.js";
+export { genRanHex } from "./genRanHex.ts";
 
 // returns a new object with the values at each key mapped using mapFn(value)
 export function objectMap(object, mapFn): object {
