@@ -13,13 +13,14 @@ export class EarthstarMessaging {
   async init() {
     console.log('EarthstarMessaging.init');
     this.shareKeys = {
-      'alice-bob': await Earthstar.Crypto.generateShareKeypair("a--b") as Earthstar.ShareKeypair,
-      'alice-charlie': await Earthstar.Crypto.generateShareKeypair("a--c") as Earthstar.ShareKeypair,
-      'bob-charlie': await Earthstar.Crypto.generateShareKeypair("b--c") as Earthstar.ShareKeypair,
-      'alice-dave': await Earthstar.Crypto.generateShareKeypair("a--d") as Earthstar.ShareKeypair,
-      'alice-edward': await Earthstar.Crypto.generateShareKeypair("a--e") as Earthstar.ShareKeypair,
-      'dave-edward': await Earthstar.Crypto.generateShareKeypair("d--e") as Earthstar.ShareKeypair,
+      'alice-bob': await Earthstar.Crypto.generateShareKeypair("axxb") as Earthstar.ShareKeypair,
+      'alice-charlie': await Earthstar.Crypto.generateShareKeypair("axxc") as Earthstar.ShareKeypair,
+      'bob-charlie': await Earthstar.Crypto.generateShareKeypair("bxxc") as Earthstar.ShareKeypair,
+      'alice-dave': await Earthstar.Crypto.generateShareKeypair("axxd") as Earthstar.ShareKeypair,
+      'alice-edward': await Earthstar.Crypto.generateShareKeypair("axxe") as Earthstar.ShareKeypair,
+      'dave-edward': await Earthstar.Crypto.generateShareKeypair("dxxe") as Earthstar.ShareKeypair,
     };
+    console.log(this.shareKeys);
     const shareAddresses = Object.keys(this.shareKeys).map((share) => this.shareKeys[share].shareAddress);
     await Deno.writeTextFile("./known_shares.json", JSON.stringify(shareAddresses, null, 2) + "\n");
     new Earthstar.Server([

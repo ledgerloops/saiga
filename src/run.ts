@@ -42,7 +42,4 @@ async function run(): Promise<void> {
 }
 
 // ...
-const networkSimulator = new MixedNetworkSimulator();
-await networkSimulator.init();
-
-// run();
+run();
