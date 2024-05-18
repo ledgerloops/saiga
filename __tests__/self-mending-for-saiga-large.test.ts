@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { jest } from '@jest/globals';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
 const NUM_ROUNDS = 100000;

@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import EventEmitter from "node:events";
 import { genRanHex } from "../genRanHex.js";
 import { createHmac } from "node:crypto";
 
