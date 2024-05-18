@@ -1,15 +1,15 @@
-import { Message, MeetMessage, ProbeMessage, TraceMessage, getMessageType } from "./messages.js";
+import { getMessageType } from "./messages.js";
 import { Entry, createPlantUml } from "./util.js";
 
 export class BasicMessageForwarder {
   private log: Entry[] = [];
-  logMessageSent(sender: string, receiver: string, message: Message): void {
+  logMessageSent(sender: string, receiver: string, message: string): void {
     this.log.push(new Entry(sender, receiver, message, 'sent'));
   }
-  logMessageReceived(sender: string, receiver: string, message: Message): void {
+  logMessageReceived(sender: string, receiver: string, message: string): void {
     this.log.push(new Entry(sender, receiver, message, 'received'));
   }
-  forwardMessage(sender: Node, receiver: Node, message: Message): void {
+  forwardMessage(sender: Node, receiver: Node, message: string): void {
     this.logMessageSent(sender.getName(), receiver.getName(), message);
     receiver.receiveMessage(sender, message);
   }
@@ -58,14 +58,14 @@ export class BatchedMessageForwarder extends BasicMessageForwarder {
   private batch: {
     sender: Node,
     receiver: Node,
-    message: Message
+    message: string
   }[] = [];
-  forwardMessage(sender: Node, receiver: Node, message: Message): void {
+  forwardMessage(sender: Node, receiver: Node, message: string): void {
     this.logMessageSent(sender.getName(), receiver.getName(), message);
     this.batch.push({ sender, receiver, message });
   }
   flush(): string[] {
-    this.logMessageSent('---', '---', { toString: () => '---', getMessageType: () => 'separator' } as Message);
+    this.logMessageSent('---', '---', '---');
     const flushReport: string[] = [];
     const batch = this.batch;
     this.batch = [];
@@ -136,39 +136,39 @@ export abstract class Node {
     this.onMeet(other.getName());
   }
 
-  protected sendMessageToFriend(friend: string, message: Message): void {
+  protected sendMessageToFriend(friend: string, message: string): void {
     this.messageForwarder.forwardMessage(this, this.friends[friend].node, message);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected handleMeetMessage(_sender: string, _message: MeetMessage): void {}
+  protected handleMeetMessage(_sender: string, _message: string): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected handleProbeMessage(_sender: string, _message: ProbeMessage): void {}
+  protected handleProbeMessage(_sender: string, _message: string): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected handleTraceMessage(_sender: string, _message: TraceMessage): void {}
+  protected handleTraceMessage(_sender: string, _message: string): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected handleHaveProbesMessage(_from: string): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected handleOkayToSendProbesMessage(_from: string): void {}
 
-  protected sendMessage(to: string, message: Message): void {
+  protected sendMessage(to: string, message: string): void {
     this.messageForwarder.forwardMessage(this, this.friends[to].node, message);
   }
-  receiveMessage(sender: Node, message: Message): void {
+  receiveMessage(sender: Node, message: string): void {
     this.debugLog.push(`[Node#receiveMessage] ${this.name} receives message from ${sender.getName()}`);
     this.messageForwarder.logMessageReceived(sender.getName(), this.getName(), message);
     // console.log(`${this.name} receives message from ${sender}`, message);
-    if (message.getMessageType() === `meet`) {
+    if (getMessageType(message) === `meet`) {
       this.addFriend(sender, HandRaisingStatus.Listening);
-      return this.handleMeetMessage(sender.getName(), message as MeetMessage);
-    } else if (message.getMessageType() === `probe`) {
-      return this.handleProbeMessage(sender.getName(), message as ProbeMessage);
-    } else if (message.getMessageType() === `loop`) {
-      return this.handleTraceMessage(sender.getName(), message as TraceMessage);
-    } else if (message.getMessageType() === `have-probes`) {
+      return this.handleMeetMessage(sender.getName(), message);
+    } else if (getMessageType(message) === `probe`) {
+      return this.handleProbeMessage(sender.getName(), message);
+    } else if (getMessageType(message) === `loop`) {
+      return this.handleTraceMessage(sender.getName(), message);
+    } else if (getMessageType(message) === `have-probes`) {
       this.messageForwarder.logMessageReceived(sender.getName(), this.getName(), message);
       this.handleHaveProbesMessage(sender.getName());
-    } else if (message.getMessageType() === `okay-to-send-probes`) {
+    } else if (getMessageType(message) === `okay-to-send-probes`) {
       this.handleOkayToSendProbesMessage(sender.getName());
 
     }

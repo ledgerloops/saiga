@@ -1,4 +1,3 @@
-import { Message } from "./messages.js";
 export { genRanHex } from "./genRanHex.js";
 
 // returns a new object with the values at each key mapped using mapFn(value)
@@ -12,9 +11,9 @@ export function objectMap(object, mapFn): object {
 export class Entry {
   sender: string;
   receiver: string;
-  message: Message | string;
+  message: string;
   event: string;
-  constructor(sender: string, receiver: string, message: Message | string, event: string) {
+  constructor(sender: string, receiver: string, message: string, event: string) {
     this.sender = sender;
     this.receiver = receiver;
     this.message = message;
@@ -49,7 +48,7 @@ function createLine(entry: Entry): string {
   if ((entry.message === 'have-probes') || (entry.message === 'okay-to-send-probes')) {
     return '';
   }
-  const parts = entry.message.toString().split(' ');
+  const parts = entry.message.split(' ');
   if (parts.length < 2) {
     return '';
   }
