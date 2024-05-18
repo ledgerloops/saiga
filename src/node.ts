@@ -1,5 +1,5 @@
-import { Message, MeetMessage, ProbeMessage, TraceMessage, getMessageType } from "./messages.ts";
-import { Entry, createPlantUml } from "./util.ts";
+import { Message, MeetMessage, ProbeMessage, TraceMessage, getMessageType } from "./messages.js";
+import { Entry, createPlantUml } from "./util.js";
 
 export class BasicMessageForwarder {
   private log: Entry[] = [];
@@ -88,13 +88,13 @@ export enum HandRaisingStatus {
 
 export class Friend {
   public handRaisingStatus: HandRaisingStatus;
-  public node: Node | null;
+  public node: Node;
   public promises: {
       resolve: () => void,
       reject: () => void,
     }[];
 
-  constructor(node: Node | null, handRaisingStatus: HandRaisingStatus) {
+  constructor(node: Node, handRaisingStatus: HandRaisingStatus) {
     this.node = node;
     this.handRaisingStatus = handRaisingStatus;
     this.promises = [];
@@ -137,7 +137,7 @@ export abstract class Node {
   }
 
   protected sendMessageToFriend(friend: string, message: Message): void {
-    this.messageForwarder.forwardMessage(this, this.friends[friend].node as Node, message);
+    this.messageForwarder.forwardMessage(this, this.friends[friend].node, message);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -152,7 +152,7 @@ export abstract class Node {
   protected handleOkayToSendProbesMessage(_from: string): void {}
 
   protected sendMessage(to: string, message: Message): void {
-    this.messageForwarder.forwardMessage(this, this.friends[to].node as Node, message);
+    this.messageForwarder.forwardMessage(this, this.friends[to].node, message);
   }
   receiveMessage(sender: Node, message: Message): void {
     this.debugLog.push(`[Node#receiveMessage] ${this.name} receives message from ${sender.getName()}`);

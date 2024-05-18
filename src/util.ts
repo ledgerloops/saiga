@@ -1,5 +1,5 @@
-import { Message } from "./messages.ts";
-export { genRanHex } from "./genRanHex.ts";
+import { Message } from "./messages.js";
+export { genRanHex } from "./genRanHex.js";
 
 // returns a new object with the values at each key mapped using mapFn(value)
 export function objectMap(object, mapFn): object {

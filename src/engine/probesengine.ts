@@ -1,13 +1,12 @@
-// deno-lint-ignore-file no-explicit-any
-import { genRanHex } from "../genRanHex.ts";
-import { Friend, HandRaisingStatus } from "../node.ts";
+import { genRanHex } from "../genRanHex.js";
+import { Friend, HandRaisingStatus } from "../node.js";
 import { EventEmitter } from 'node:events';
 
-function objectMap(object: { [x: string]: any; }, mapFn: { (probe: any): any; (arg0: any): any; }): object {
+function objectMap(object, mapFn): object {
   return Object.keys(object).reduce(function(result, key) {
-    result[key] = mapFn(object[key]);
-    return result;
-  }, {} as { [x: string]: any; }); // Add index signature to the empty object
+  result[key] = mapFn(object[key])
+  return result
+  }, {})
 }
 
 export class Probe {
@@ -97,7 +96,7 @@ export class ProbesEngine extends EventEmitter {
       }[]
       }
   } {
-    return objectMap(this.probes, ((probe: { toJson: () => any; }) => probe.toJson())) as {
+    return objectMap(this.probes, (probe => probe.toJson())) as {
       [id: string]: {
         from: string[],
         to: string[],
@@ -126,16 +125,14 @@ export class ProbesEngine extends EventEmitter {
     if (typeof this.probesToOffer[friend] !== 'undefined') {
       this.probesToOffer[friend].forEach(probeId => {
         const probe = this.get(probeId);
-        if (probe && probe.isVirginFor(friend)) { // Add null check for probe
+        if (probe.isVirginFor(friend)) {
           this.emit('debug', `QUEUEING PROBE ${probe.getProbeId()} TO ${friend} [3/4]`);
           probe.recordOutgoing(friend);
           const message = `probe ${probe.getProbeId()}`;
           this.emit('message', friend, message);
         }
       });
-      if (this.friends[friend] && this.friends[friend].promises) { // Add null check for this.friends[friend].promises
-        this.friends[friend].promises = [];
-      }
+      delete this.friends[friend].promises;
     }
   }
   public handleOkayToSendProbesMessage(friend: string): void {

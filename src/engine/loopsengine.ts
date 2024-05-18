@@ -1,5 +1,5 @@
-import EventEmitter from "node:events";
-import { genRanHex } from "../genRanHex.ts";
+import EventEmitter from "events";
+import { genRanHex } from "../genRanHex.js";
 import { createHmac } from "node:crypto";
 
 function sha256(secret: string): string {
@@ -55,7 +55,9 @@ export class GiraffeLoopsEngine extends EventEmitter {
       this.emit('debug', `expected propose message but got ${messageType}`);
     }
     if (typeof this.lifts[hash] !== 'undefined') {
-      if ((this.lifts[hash]?.incomingAmount ?? 0) >= (this.lifts[hash]?.outgoingAmount ?? 0)) {
+      this.lifts[hash].incomingAmount = parseFloat(amount);
+      this.emit('debug', `initiator decides on lift: is ${this.lifts[hash].incomingAmount} more than ${this.lifts[hash].outgoingAmount}?`);
+      if (this.lifts[hash].incomingAmount >= this.lifts[hash].outgoingAmount) {
         this.emit('message', proposer.name, `commit ${probeId} ${traceId} ${legId} ${hash} ${this.lifts[hash].incomingAmount} ${this.lifts[hash].secret}`);
       }
     } else {

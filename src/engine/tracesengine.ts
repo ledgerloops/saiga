@@ -1,10 +1,9 @@
-// deno-lint-ignore-file no-explicit-any
 import EventEmitter from "node:events";
-import { genRanHex } from "../genRanHex.ts";
+import { genRanHex } from "../genRanHex.js";
 
 export class TracesEngine extends EventEmitter {
-  tracesCreated: { [probeId: string]: { [traceId: string]: { [to: string]: string } } } = {};
-  tracesForwarded: { [probeId: string]: { [traceId: string]: { [to: string]: string } } } = {};
+  tracesCreated = {};
+  tracesForwarded = {};
   getLegsForwarded(probeId: string, traceId: string): { [to: string]: string } | undefined {
     return this.tracesForwarded[probeId]?.[traceId];
   }
@@ -93,10 +92,10 @@ export class TracesEngine extends EventEmitter {
   }
 
   handleProbeLoopback(probeId: string): void {
-    this.emit('lookup-probe', probeId, (probeFrom: any[]) => {
+    this.emit('lookup-probe', probeId, (probeFrom) => {
       const traceId = genRanHex(8);
-      const legs: { [key: string]: string } = {}; // Add index signature to allow indexing with a string or number
-      probeFrom.forEach((from: string | number) => {
+      const legs = {};
+      probeFrom.forEach((from) => {
         const legId = genRanHex(8);
         legs[from] = legId;
         this.emit('message', from, `trace ${probeId} ${traceId} ${legId}`);

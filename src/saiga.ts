@@ -1,13 +1,12 @@
 import EventEmitter from "node:events";
-import { MessageForwarder } from "../../ledgerloops-earthstar/src/messaging.ts";
-import { ProbesEngine } from "./engine/probesengine.ts";
-import { SaigaFriendsEngine } from "./engine/friendsengine.ts";
-import { TracesEngine } from "./engine/tracesengine.ts";
-import { SaigaLoopsEngine } from "./engine/loopsengine.ts";
-import { getMessageType } from "./messages.ts";
+import { NetworkNode } from "./simulator/networksimulator.js";
+import { getMessageType } from "./messages.js";
+import { ProbesEngine } from "./engine/probesengine.js";
+import { SaigaFriendsEngine } from "./engine/friendsengine.js";
+import { TracesEngine } from "./engine/tracesengine.js";
+import { SaigaLoopsEngine } from "./engine/loopsengine.js";
 
-export class Saiga extends EventEmitter {
-  protected messageForwarder: MessageForwarder;
+export class Saiga extends EventEmitter implements NetworkNode {
   protected friendsEngine: SaigaFriendsEngine;
   protected probesEngine: ProbesEngine;
   protected tracesEngine: TracesEngine;
@@ -15,18 +14,14 @@ export class Saiga extends EventEmitter {
   protected debugLog: string[] = [];
   protected name: string;
 
-  constructor(name: string, messageForwarder: MessageForwarder) {
+  constructor(name: string) {
     super();
     this.name = name;
-    this.messageForwarder = messageForwarder;
     this.friendsEngine = new SaigaFriendsEngine(name);
     this.probesEngine = this.connectProbesEngine();
     this.tracesEngine = this.connectTracesEngine(this.probesEngine);
     this.loopsEngine = this.connectLoopsEngine(this.tracesEngine);
     this.loopsEngine.setProfit(0.01);
-  }
-  async init() {
-
   }
   protected connectProbesEngine(): ProbesEngine {
     const probesengine = new ProbesEngine(this.name);
@@ -67,7 +62,7 @@ export class Saiga extends EventEmitter {
   protected connectLoopsEngine(traceEngine: TracesEngine): SaigaLoopsEngine {
     const loopsEngine = new SaigaLoopsEngine();
     traceEngine.on('loop-found', (probeId: string, traceId: string, legId: string, outgoing: string, incoming: string) => {
-      return loopsEngine.handleLoopFound(probeId, traceId, legId, this.friendsEngine.getFriend(outgoing) as { name: string, maxBalance: number, exchangeRate: number }, this.friendsEngine.getFriend(incoming) as { name: string, maxBalance: number, exchangeRate: number });
+      loopsEngine.handleLoopFound(probeId, traceId, legId, this.friendsEngine.getFriend(outgoing), this.friendsEngine.getFriend(incoming));
     });
     loopsEngine.on('debug', (message: string) => {
       this.debugLog.push(message);
@@ -83,7 +78,7 @@ export class Saiga extends EventEmitter {
     const [messageType, probeId, traceId, legId] = message.split(' ');
     const otherPartyName = this.tracesEngine.getOtherParty(from, probeId, traceId, legId);
     const sender = this.friendsEngine.getFriend(from);
-    const otherParty = this.friendsEngine.getFriend(otherPartyName as string);
+    const otherParty = this.friendsEngine.getFriend(otherPartyName);
     if (typeof sender === 'undefined' || typeof otherParty === 'undefined') {
       this.debugLog.push(`other party not found for ${from} ${message}`);
       return;
@@ -97,7 +92,7 @@ export class Saiga extends EventEmitter {
   process(sender: string, message: string): void {
     this.debugLog.push(`[Node#receiveMessage] ${this.name} receives message from ${sender}`);
     // console.log(`${this.name} receives message from ${sender}`, message);
-    switch (getMessageType(message)) {
+    switch(getMessageType(message)) {
       case `meet`:
         this.friendsEngine.addFriend(sender);
         this.debugLog.push(`MEET MESSAGE FROM ${sender}, queueing all flood probes`);
@@ -135,7 +130,7 @@ export class Saiga extends EventEmitter {
         to: string,
         traceId: string
       }[]
-    }
+     }
   } {
     return this.probesEngine.getProbes();
   }
