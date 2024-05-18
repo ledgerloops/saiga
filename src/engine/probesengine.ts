@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { genRanHex } from "../genRanHex.ts";
 import { EventEmitter } from 'node:events';
 
@@ -20,8 +21,8 @@ export class Friend {
   }
 }
 
-function objectMap(object, mapFn): object {
-  return Object.keys(object).reduce(function(result, key) {
+function objectMap(object: { [x: string]: any; }, mapFn: { (probe: any): any; (arg0: any): any; }): object {
+  return Object.keys(object).reduce(function(result: { [x: string]: any; }, key) {
   result[key] = mapFn(object[key])
   return result
   }, {})
