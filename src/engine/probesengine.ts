@@ -1,6 +1,24 @@
 import { genRanHex } from "../genRanHex.js";
-import { Friend, HandRaisingStatus } from "../node.js";
 import { EventEmitter } from 'node:events';
+
+export enum HandRaisingStatus {
+  Listening,
+  Waiting,
+  Talking,
+}
+
+export class Friend {
+  public handRaisingStatus: HandRaisingStatus;
+  public promises: {
+      resolve: () => void,
+      reject: () => void,
+    }[];
+
+  constructor(handRaisingStatus: HandRaisingStatus) {
+    this.handRaisingStatus = handRaisingStatus;
+    this.promises = [];
+  }
+}
 
 function objectMap(object, mapFn): object {
   return Object.keys(object).reduce(function(result, key) {
@@ -174,7 +192,7 @@ export class ProbesEngine extends EventEmitter {
     return this.queueFloodProbeToAll(genRanHex(8), true);
   }
   public addFriend(other: string, weInitiate: boolean, createFloodProbe: boolean): void {
-    this.friends[other] = new Friend(null, weInitiate ? HandRaisingStatus.Talking : HandRaisingStatus.Listening);
+    this.friends[other] = new Friend(weInitiate ? HandRaisingStatus.Talking : HandRaisingStatus.Listening);
 
     this.queueAllFloodProbes(other);
     if (createFloodProbe) {
