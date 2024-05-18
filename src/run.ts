@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { readFileSync } from 'node:fs';
-import { BatchedNetworkSimulator, Saiga } from './main.ts';
+import { MixedNetworkSimulator, Saiga } from './main.ts';
 
 const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
 const NUM_ROUNDS = 100000;
 
-function run(): void {
+async function run(): Promise<void> {
   console.log("This simulation will take about 60 seconds to complete.");
-  const nodes = {};
+  const nodes: { [index: string]: Saiga } = {};
   let flushReport;
-  const networkSimulator = new BatchedNetworkSimulator();
+  const networkSimulator = new MixedNetworkSimulator();
+  await networkSimulator.init();
   const data = readFileSync(TESTNET_CSV, 'utf8')
   const lines = data.split('\n').map(line => {
     const [ from, to ] = line.split(' ')
@@ -41,4 +42,7 @@ function run(): void {
 }
 
 // ...
-run();
+const networkSimulator = new MixedNetworkSimulator();
+await networkSimulator.init();
+
+// run();

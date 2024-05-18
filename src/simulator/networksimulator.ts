@@ -4,10 +4,14 @@ import { Entry, createPlantUml } from "../util.ts";
 import { EarthstarMessaging } from "./earthstar.ts";
 
 export abstract class NetworkNode extends EventEmitter {
-  abstract process(from: string, message: string);
+  abstract process(from: string, message: string):  void;
 }
 export class NetworkSimulator {
   protected nodes: { [name: string]: NetworkNode } = {};
+  async init(): Promise<void> {
+    // no-op
+  }
+
   addNode(name: string, node: NetworkNode): void {
     this.nodes[name] = node;
   }
@@ -81,6 +85,11 @@ export class TransportPackage {
   sender: string;
   receiver: string;
   message: string;
+  constructor(sender: string, receiver: string, message: string) {
+    this.sender = sender;
+    this.receiver = receiver;
+    this.message = message;
+  }
 }
 
 export class BatchedNetworkSimulator extends LoggingNetworkSimulator {
@@ -123,6 +132,10 @@ export class MixedNetworkSimulator extends BatchedNetworkSimulator {
   constructor() {
     super();
     this.earthstarMessaging = new EarthstarMessaging(this);
+  }
+  async init(): Promise<void> {
+    console.log('MixedNetworkSimulator.init');
+    await this.earthstarMessaging.init();
   }
   send(transportPackage: TransportPackage): void {
     // TODO: send this message out into the ether
