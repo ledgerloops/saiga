@@ -1,13 +1,5 @@
 export { genRanHex } from "./genRanHex.ts";
 
-// returns a new object with the values at each key mapped using mapFn(value)
-export function objectMap(object, mapFn): object {
-  return Object.keys(object).reduce(function(result, key) {
-    result[key] = mapFn(object[key])
-    return result
-  }, {})
-}
-
 export class Entry {
   sender: string;
   receiver: string;
@@ -31,7 +23,7 @@ function createPreamble(): string {
   return `@startuml messages\n`;
 }
 function createLine(entry: Entry): string {
-  const colors = {
+  const colors: { [index: string]: string } = {
     'probe': 'blue',
     'trace': 'green',
     'meet': 'orange',

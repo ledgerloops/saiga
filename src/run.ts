@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { BatchedNetworkSimulator, Saiga } from './main.ts';
+import { BatchedNetworkSimulator } from './main.ts';
 
 const BEFORE = './post-init.json';
 const AFTER = './post-run.json';
 const NUM_ROUNDS = 100000;
 
-function run() {
+export function run() {
   console.log("This simulation will take about 60 seconds to complete.");
   let flushReport;
   const networkSimulator = new BatchedNetworkSimulator();
@@ -25,6 +25,3 @@ function run() {
   console.log("Simulation completed.");
   writeFileSync(AFTER, JSON.stringify(networkSimulator.toSnapshot(), null, 2) + '\n');
 }
-
-// ...
-run();

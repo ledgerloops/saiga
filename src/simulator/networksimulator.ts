@@ -1,7 +1,6 @@
 import EventEmitter from "node:events";
 import { getMessageType } from "../messages.ts";
 import { Entry, createPlantUml } from "../util.ts";
-import { EarthstarMessaging } from "./earthstar.ts";
 import { Saiga } from "../saiga.ts";
 
 export abstract class NetworkNode extends EventEmitter {
@@ -151,25 +150,5 @@ export class BatchedNetworkSimulator extends LoggingNetworkSimulator {
     const snapshot = super.toSnapshot();
     snapshot.batch = this.batch;
     return snapshot;
-  }
-}
-
-export class MixedNetworkSimulator extends BatchedNetworkSimulator {
-  private earthstarMessaging: EarthstarMessaging;
-  constructor() {
-    super();
-    this.earthstarMessaging = new EarthstarMessaging(this);
-  }
-  async init(links: string[]): Promise<void> {
-    console.log('MixedNetworkSimulator.init');
-    await this.earthstarMessaging.init(links);
-  }
-  send(transportPackage: TransportPackage): void {
-    // TODO: send this message out into the ether
-    // so that it somehow comes back to our receive method
-    this.earthstarMessaging.send(transportPackage);
-  }
-  receive(transportPackage: TransportPackage): void {
-    this.nodes[transportPackage.receiver].process(transportPackage.sender, transportPackage.message);
   }
 }

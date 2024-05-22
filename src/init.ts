@@ -3,10 +3,10 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { BatchedNetworkSimulator, Saiga } from './main.ts';
 
-const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
+const TESTNET_CSV = 'testnet-10.csv';
 const SNAPSHOT = './post-init.json';
 
-async function run(): Promise<void> {
+export async function init(): Promise<void> {
   const nodes: { [index: string]: Saiga } = {};
   const networkSimulator = new BatchedNetworkSimulator();
   console.log("Network simulator initialized.");
@@ -32,6 +32,3 @@ async function run(): Promise<void> {
   });
   writeFileSync(SNAPSHOT, JSON.stringify(networkSimulator.toSnapshot(), null, 2) + '\n');
 }
-
-// ...
-run();
