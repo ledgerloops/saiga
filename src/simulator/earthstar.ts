@@ -114,7 +114,7 @@ export class EarthstarMessaging {
       new Earthstar.ExtensionSyncWeb(),
     ]);
     // FIXME: how can we know when the server is ready?
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 4000));
     // await this.earthstarServer.start();
     console.log("Syncing peers with server");
     Object.keys(this.peers).forEach((peer) => {

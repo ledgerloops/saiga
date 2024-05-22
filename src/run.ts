@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { MixedNetworkSimulator, Saiga } from './main.ts';
 
-const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
+const TESTNET_CSV = '__tests__/fixtures/testnet-2.csv';
 const NUM_ROUNDS = 100000;
 
 async function run(): Promise<void> {
