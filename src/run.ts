@@ -11,14 +11,15 @@ async function run(): Promise<void> {
   const nodes: { [index: string]: Saiga } = {};
   let flushReport;
   const networkSimulator = new MixedNetworkSimulator();
-  await networkSimulator.init();
+  console.log("Network simulator initialized.");
   const data = readFileSync(TESTNET_CSV, 'utf8')
   const lines = data.split('\n').map(line => {
     const [ from, to ] = line.split(' ')
     return { from, to }
   }).filter(line => line.from !== 'from' && line.from !== '');
+  await networkSimulator.init(lines.map(line => `${line.from} ${line.to}`));
   lines.forEach(async line => {
-    if (typeof nodes[line.from] === 'undefined') {
+      if (typeof nodes[line.from] === 'undefined') {
       // console.log("Adding node", line.from);
       nodes[line.from] = new Saiga(line.from);
       networkSimulator.addNode(line.from, nodes[line.from]);

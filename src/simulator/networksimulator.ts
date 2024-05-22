@@ -8,7 +8,7 @@ export abstract class NetworkNode extends EventEmitter {
 }
 export class NetworkSimulator {
   protected nodes: { [name: string]: NetworkNode } = {};
-  async init(): Promise<void> {
+  async init(_links: string[]): Promise<void> {
     // no-op
   }
 
@@ -133,9 +133,9 @@ export class MixedNetworkSimulator extends BatchedNetworkSimulator {
     super();
     this.earthstarMessaging = new EarthstarMessaging(this);
   }
-  async init(): Promise<void> {
+  async init(links: string[]): Promise<void> {
     console.log('MixedNetworkSimulator.init');
-    await this.earthstarMessaging.init();
+    await this.earthstarMessaging.init(links);
   }
   send(transportPackage: TransportPackage): void {
     // TODO: send this message out into the ether
