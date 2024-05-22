@@ -8,3 +8,9 @@ It will support different P2P messaging networks to implement communication betw
 ```
 deno run -A src/run.ts
 ```
+
+If you want to try out the [Earthstar](https://earthstar-project.org/) transport for messaging ([not working yet](https://github.com/ledgerloops/saiga/issues/1)!) do this instead:
+
+```
+deno run -A src/run-earthstar.ts
+```
