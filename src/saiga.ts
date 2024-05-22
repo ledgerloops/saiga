@@ -1,7 +1,7 @@
 import EventEmitter from "node:events";
 import { NetworkNode } from "./simulator/networksimulator.ts";
 import { getMessageType } from "./messages.ts";
-import { ProbesEngine } from "./engine/probesengine.ts";
+import { HandRaisingStatus, Probe, ProbesEngine } from "./engine/probesengine.ts";
 import { SaigaFriendsEngine } from "./engine/friendsengine.ts";
 import { TracesEngine } from "./engine/tracesengine.ts";
 import { SaigaLoopsEngine } from "./engine/loopsengine.ts";
@@ -29,8 +29,26 @@ export class Saiga extends EventEmitter implements NetworkNode {
       probes: this.probesEngine.toSnapshot(),
       traces: this.tracesEngine.toSnapshot(),
       loops: this.loopsEngine.toSnapshot(),
-      debugLog: this.debugLog
+      debugLog: this.debugLog,
+      name: this.name
     };
+  }
+  fromSnapshot(snapshot: { friends: object, probes: object, traces: object, loops: object, debugLog: string[], name: string }) {
+    this.friendsEngine.fromSnapshot(snapshot.friends as { [name: string]: { name: string, maxBalance: number, exchangeRate: number } });
+    this.probesEngine.fromSnapshot(snapshot.probes as {
+      probes: {
+        [id: string]: Probe
+      },
+      friends: {
+        [name: string]: {
+          handRaisingStatus: HandRaisingStatus,
+        }
+      }
+    });
+    this.tracesEngine.fromSnapshot(snapshot.traces as { tracesCreated: object, tracesForwarded: object });
+    this.loopsEngine.fromSnapshot(snapshot.loops as { loops: string[], lifts: { [hash: string]: { loop: string, legId: string, secret?: string, incomingAmount?: number, outgoingAmount: number } }, profit: number });
+    this.debugLog = snapshot.debugLog;
+    this.name = snapshot.name;
   }
   protected connectProbesEngine(): ProbesEngine {
     const probesengine = new ProbesEngine(this.name);

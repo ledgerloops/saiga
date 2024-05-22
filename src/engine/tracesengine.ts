@@ -10,6 +10,10 @@ export class TracesEngine extends EventEmitter {
       tracesForwarded: this.tracesForwarded,
     };
   }
+  fromSnapshot(snapshot: { tracesCreated: object, tracesForwarded: object }) {
+    this.tracesCreated = snapshot.tracesCreated as { [probeId: string]: { [traceId: string]: { [sender: string]: string } } };
+    this.tracesForwarded = snapshot.tracesForwarded as { [probeId: string]: { [traceId: string]: { [sender: string]: string } } };
+  }
   getLegsForwarded(probeId: string, traceId: string): { [to: string]: string } | undefined {
     return this.tracesForwarded[probeId]?.[traceId];
   }

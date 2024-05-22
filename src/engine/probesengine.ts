@@ -93,6 +93,19 @@ export class ProbesEngine extends EventEmitter {
       friends: this.friends,
     };
   }
+  fromSnapshot(snapshot: {
+    probes: {
+      [id: string]: Probe
+    },
+    friends: {
+      [name: string]: {
+        handRaisingStatus: HandRaisingStatus,
+      }
+    }
+  }) {
+    this.probes = snapshot.probes;
+    this.friends = snapshot.friends;
+  }
   get(id: string): Probe | undefined {
     return this.probes[id];
   }

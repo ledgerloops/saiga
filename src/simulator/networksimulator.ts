@@ -2,10 +2,12 @@ import EventEmitter from "node:events";
 import { getMessageType } from "../messages.ts";
 import { Entry, createPlantUml } from "../util.ts";
 import { EarthstarMessaging } from "./earthstar.ts";
+import { Saiga } from "../saiga.ts";
 
 export abstract class NetworkNode extends EventEmitter {
   abstract process(from: string, message: string):  void;
   abstract toSnapshot(): object;
+  abstract fromSnapshot(snapshot: object): void;
 }
 export class NetworkSimulator {
   protected nodes: { [name: string]: NetworkNode } = {};
@@ -17,11 +19,18 @@ export class NetworkSimulator {
     this.nodes[name] = node;
   }
   toSnapshot(): { [index: string]: object } {
-    const ret: { [index: string]: object } = {};
+    const nodes: { [index: string]: object } = {};
     Object.keys(this.nodes).forEach(name => {
-      ret[name] = this.nodes[name].toSnapshot();
+      nodes[name] = this.nodes[name].toSnapshot();
     });
-    return ret;
+    return { nodes };
+  }
+  fromSnapshot(snapshot: { nodes: { [index: string]: object } }) {
+    console.log("network simulator from snapshot", snapshot);
+    Object.keys(snapshot.nodes).forEach(name => {
+      this.nodes[name] = new Saiga(name);
+      this.nodes[name].fromSnapshot(snapshot.nodes[name] as { friends: object, probes: object, traces: object, loops: object, debugLog: string[], name: string });
+    });
   }
 }
 

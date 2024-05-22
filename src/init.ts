@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { BatchedNetworkSimulator, Saiga } from './main.ts';
 
 const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
+const SNAPSHOT = './snapshot.json';
 
 async function run(): Promise<void> {
   const nodes: { [index: string]: Saiga } = {};
@@ -29,7 +30,7 @@ async function run(): Promise<void> {
     // console.log("Meeting", JSON.stringify(line.from), JSON.stringify(line.to));
     await nodes[line.from].meet(line.to);
   });
-  writeFileSync('snapshot.json', JSON.stringify(networkSimulator.toSnapshot(), null, 2) + '\n');
+  writeFileSync(SNAPSHOT, JSON.stringify(networkSimulator.toSnapshot(), null, 2) + '\n');
 }
 
 // ...
