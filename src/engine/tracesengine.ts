@@ -2,8 +2,14 @@ import EventEmitter from "node:events";
 import { genRanHex } from "../genRanHex.ts";
 
 export class TracesEngine extends EventEmitter {
-  tracesCreated = {};
-  tracesForwarded = {};
+  tracesCreated: { [probeId: string]: { [traceId: string]: { [sender: string]: string } } } = {};
+  tracesForwarded: { [probeId: string]: { [traceId: string]: { [sender: string]: string } } } = {};
+  toSnapshot(): { tracesCreated: object, tracesForwarded: object } {
+    return {
+      tracesCreated: this.tracesCreated,
+      tracesForwarded: this.tracesForwarded,
+    };
+  }
   getLegsForwarded(probeId: string, traceId: string): { [to: string]: string } | undefined {
     return this.tracesForwarded[probeId]?.[traceId];
   }
@@ -92,10 +98,10 @@ export class TracesEngine extends EventEmitter {
   }
 
   handleProbeLoopback(probeId: string): void {
-    this.emit('lookup-probe', probeId, (probeFrom) => {
+    this.emit('lookup-probe', probeId, (probeFrom: string[]) => {
       const traceId = genRanHex(8);
-      const legs = {};
-      probeFrom.forEach((from) => {
+      const legs: { [index: string]: string } = {};
+      probeFrom.forEach((from: string) => {
         const legId = genRanHex(8);
         legs[from] = legId;
         this.emit('message', from, `trace ${probeId} ${traceId} ${legId}`);

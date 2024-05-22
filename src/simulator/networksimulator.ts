@@ -5,6 +5,7 @@ import { EarthstarMessaging } from "./earthstar.ts";
 
 export abstract class NetworkNode extends EventEmitter {
   abstract process(from: string, message: string):  void;
+  abstract toSnapshot(): object;
 }
 export class NetworkSimulator {
   protected nodes: { [name: string]: NetworkNode } = {};
@@ -14,6 +15,13 @@ export class NetworkSimulator {
 
   addNode(name: string, node: NetworkNode): void {
     this.nodes[name] = node;
+  }
+  toSnapshot(): { [index: string]: object } {
+    const ret: { [index: string]: object } = {};
+    Object.keys(this.nodes).forEach(name => {
+      ret[name] = this.nodes[name].toSnapshot();
+    });
+    return ret;
   }
 }
 
@@ -65,6 +73,11 @@ export class LoggingNetworkSimulator extends NetworkSimulator {
   }
   getPlantUml(): string {
     return createPlantUml(this.log);
+  }
+  toSnapshot(): { [index: string]: object } {
+    const snapshot = super.toSnapshot();
+    snapshot.log = this.log;
+    return snapshot;
   }
 }
 
@@ -125,6 +138,11 @@ export class BatchedNetworkSimulator extends LoggingNetworkSimulator {
     return this.batch.map(entry => `[${entry.sender}]->[${entry.receiver}] ${entry.message}`);
   }
 
+  toSnapshot(): { [index: string]: object } {
+    const snapshot = super.toSnapshot();
+    snapshot.batch = this.batch;
+    return snapshot;
+  }
 }
 
 export class MixedNetworkSimulator extends BatchedNetworkSimulator {

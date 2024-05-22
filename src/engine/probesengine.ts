@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import { genRanHex } from "../genRanHex.ts";
 import { EventEmitter } from 'node:events';
 
@@ -10,22 +9,10 @@ export enum HandRaisingStatus {
 
 export class Friend {
   public handRaisingStatus: HandRaisingStatus;
-  public promises: {
-      resolve: () => void,
-      reject: () => void,
-    }[];
 
   constructor(handRaisingStatus: HandRaisingStatus) {
     this.handRaisingStatus = handRaisingStatus;
-    this.promises = [];
   }
-}
-
-function objectMap(object: { [x: string]: any; }, mapFn: { (probe: any): any; (arg0: any): any; }): object {
-  return Object.keys(object).reduce(function(result: { [x: string]: any; }, key) {
-  result[key] = mapFn(object[key])
-  return result
-  }, {})
 }
 
 export class Probe {
@@ -91,6 +78,21 @@ export class ProbesEngine extends EventEmitter {
     super();
     this.name = name;
   }
+  toSnapshot(): {
+    probes: {
+      [id: string]: Probe
+    },
+    friends: {
+      [name: string]: {
+        handRaisingStatus: HandRaisingStatus,
+      }
+    }
+  } {
+    return {
+      probes: this.probes,
+      friends: this.friends,
+    };
+  }
   get(id: string): Probe | undefined {
     return this.probes[id];
   }
@@ -102,31 +104,6 @@ export class ProbesEngine extends EventEmitter {
   }
   getKeys(): string[] {
     return Object.keys(this.probes);
-  }
-  getProbes(): {
-    [id: string]: {
-      from: string[],
-      to: string[],
-      homeMinted: boolean,
-      traces: {
-        from: string | undefined,
-        to: string,
-        traceId: string
-      }[]
-      }
-  } {
-    return objectMap(this.probes, (probe => probe.toJson())) as {
-      [id: string]: {
-        from: string[],
-        to: string[],
-        homeMinted: boolean,
-        traces: {
-          from: string | undefined,
-          to: string,
-          traceId: string
-        }[]
-        }
-    };
   }
 
   // Postpone sending of probes until we have received the okay-to-send-probes message
@@ -154,7 +131,6 @@ export class ProbesEngine extends EventEmitter {
           this.emit('message', friend, message);
         }
       });
-      this.friends[friend].promises = [];
     }
   }
   public handleOkayToSendProbesMessage(friend: string): void {

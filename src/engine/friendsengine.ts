@@ -29,7 +29,12 @@ export class GiraffeFriendsEngine {
   getFriends(): string[] {
     return Object.keys(this.friends);
   }
-
+  toSnapshot() {
+    return this.friends;
+  }
+  fromSnapshot(snapshot: { [name: string]: { name: string, maxBalance: number, exchangeRate: number } }) {
+    this.friends = snapshot;
+  }
 }
 export class SaigaFriendsEngine extends GiraffeFriendsEngine {
   constructor(name: string) {

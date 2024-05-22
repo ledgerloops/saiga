@@ -24,6 +24,18 @@ export class GiraffeLoopsEngine extends EventEmitter {
     this.lifts = {};
     this.profit = 0.01;
   }
+  toSnapshot(): { loops: string[], lifts: { [hash: string]: { loop: string, legId: string, secret?: string, incomingAmount?: number, outgoingAmount: number } }, profit: number } {
+    return {
+      loops: this.loops,
+      lifts: this.lifts,
+      profit: this.profit,
+    };
+  }
+  fromSnapshot(snapshot: { loops: string[], lifts: { [hash: string]: { loop: string, legId: string, secret?: string, incomingAmount?: number, outgoingAmount: number } }, profit: number }) {
+    this.loops = snapshot.loops;
+    this.lifts = snapshot.lifts;
+    this.profit = snapshot.profit;
+  }
   setProfit(profit: number): void {
     this.profit = profit;
   }

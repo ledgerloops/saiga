@@ -23,6 +23,15 @@ export class Saiga extends EventEmitter implements NetworkNode {
     this.loopsEngine = this.connectLoopsEngine(this.tracesEngine);
     this.loopsEngine.setProfit(0.01);
   }
+  toSnapshot() {
+    return {
+      friends: this.friendsEngine.toSnapshot(),
+      probes: this.probesEngine.toSnapshot(),
+      traces: this.tracesEngine.toSnapshot(),
+      loops: this.loopsEngine.toSnapshot(),
+      debugLog: this.debugLog
+    };
+  }
   protected connectProbesEngine(): ProbesEngine {
     const probesengine = new ProbesEngine(this.name);
     probesengine.on('message', (to: string, message: string) => {
@@ -129,20 +138,6 @@ export class Saiga extends EventEmitter implements NetworkNode {
   // initiateLift(traceId: string) {
   //   this.friendsEngine.
   // }
-  getProbes(): {
-    [id: string]: {
-      from: string[],
-      to: string[],
-      homeMinted: boolean,
-      traces: {
-        from: string | undefined,
-        to: string,
-        traceId: string
-      }[]
-     }
-  } {
-    return this.probesEngine.getProbes();
-  }
   getName(): string {
     return this.name;
   }
