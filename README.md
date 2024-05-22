@@ -11,4 +11,3 @@ node ./node_modules/esm/cli.js run
 
 If you want to try out the [Earthstar](https://earthstar-project.org/) transport for messaging ([not working yet](https://github.com/ledgerloops/saiga/issues/1)!),
 see [the Earthstar branch](https://github.com/ledgerloops/saiga/tree/earthstar).
-cd .
