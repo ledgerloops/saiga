@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { BatchedNetworkSimulator, Saiga } from './main.ts';
 
 const TESTNET_CSV = '__tests__/fixtures/testnet-10.csv';
-const SNAPSHOT = './snapshot.json';
+const SNAPSHOT = './post-init.json';
 
 async function run(): Promise<void> {
   const nodes: { [index: string]: Saiga } = {};
